@@ -1,7 +1,7 @@
 package internal
 
 type Pod struct {
-	podName string
+	PodName string
 }
 
 type PodRef struct {
@@ -10,7 +10,7 @@ type PodRef struct {
 		Namespace string `json:"namespace"`
 	} `json:"podRef"`
 	EphemeralStorage struct {
-		Usedbytes float64 `json:"usedBytes"`
+		Usedbytes any `json:"usedBytes"`
 	} `json:"ephemeral-storage"`
 }
 

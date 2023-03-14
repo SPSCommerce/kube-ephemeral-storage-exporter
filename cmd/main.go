@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	internal "github.com/SPSCommerce/k8s-ephemeral-storage-exporter/internal"
 	"path/filepath"
-
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -103,13 +103,11 @@ func main() {
 	config, _ := clientcmd.BuildConfigFromFlags("", runtimeConfig.KubeConfig)
 	if err != nil {
 		logger.Fatalf("Unable to build config: %s", err)
-		panic(err.Error())
 	}
 
 	clientset := kubernetes.NewForConfigOrDie(config)
 	if err != nil {
 		logger.Fatalf("Unable to create kubernetes clientset: %s", err)
-		panic(err.Error())
 	}
 
 	rootCtx := context.Background()
@@ -125,7 +123,6 @@ func main() {
 	http.Handle("/up", http.HandlerFunc(UpEndpointHandler))
 	if http.ListenAndServe(fmt.Sprintf(":%d", runtimeConfig.Port), nil) != nil {
 		logger.Fatalf("unable to listen port %d: %s", runtimeConfig.Port, err)
-		panic(err.Error())
 	}
 
 }

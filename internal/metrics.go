@@ -41,12 +41,12 @@ func metricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, met
 				//Deleting metrics of pods that do not exist anymore
 				m := make(map[string]bool)
 				for _, pod := range *new_pods {
-					m[pod.podName] = true
+					m[pod.PodName] = true
 				}
 				for _, pod := range *pods {
-					if _, ok := m[pod.podName]; !ok {
-						metric.DeletePartialMatch(prometheus.Labels{"pod": pod.podName, "node": nodeName})
-						logger.Infof("Pod %v was deleted", pod.podName)
+					if _, ok := m[pod.PodName]; !ok {
+						metric.DeletePartialMatch(prometheus.Labels{"pod": pod.PodName, "node": nodeName})
+						logger.Infof("Pod %v was deleted", pod.PodName)
 					}
 				}
 				pods = new_pods
@@ -127,7 +127,7 @@ func processSingleNodeMetrics(ctx context.Context, clientset *kubernetes.Clients
 
 	for _, pod := range node.Pods {
 		metric.With(prometheus.Labels{"pod": pod.PodRef.Name, "node": nodeName, "namespace": pod.PodRef.Namespace}).Set(pod.EphemeralStorage.Usedbytes)
-		pods = append(pods, Pod{podName: pod.PodRef.Name})
+		pods = append(pods, Pod{PodName: pod.PodRef.Name})
 	}
 	return &pods, nil
 }
