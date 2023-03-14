@@ -17,13 +17,12 @@ import (
 )
 
 func metricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, metric *prometheus.GaugeVec, nodeName string, logger *zap.SugaredLogger, runtimeConfig *RunConfiguration) {
-	// Creating empty slice for pods
 	var pods *[]Pod
 	var err error
 	for {
 		select {
+		// Cancel goroutine after node is deleted from a cluster
 		case <-ctx.Done():
-			logger.Infof("Monitoring of node %v was canceled", nodeName)
 			metric.DeletePartialMatch(prometheus.Labels{"node": nodeName})
 			return
 		default:
@@ -34,22 +33,22 @@ func metricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, met
 					logger.Errorf("Gathering metrics for pods on node: %v failed", nodeName)
 				}
 			} else {
-				new_pods, err := processSingleNodeMetrics(ctx, clientset, logger.Named("processSingleNodeMetrics"), metric, nodeName)
+				newPods, err := processSingleNodeMetrics(ctx, clientset, logger.Named("processSingleNodeMetrics"), metric, nodeName)
 				if err != nil {
-					// work on the error
+					logger.Errorf("Processing metrics for node %v failed with error: %s", nodeName, err)
 				}
 				//Deleting metrics of pods that do not exist anymore
-				m := make(map[string]bool)
-				for _, pod := range *new_pods {
-					m[pod.PodName] = true
+				newPodsNameMap := make(map[string]bool)
+				for _, pod := range *newPods {
+					newPodsNameMap[pod.PodName] = true
 				}
 				for _, pod := range *pods {
-					if _, ok := m[pod.PodName]; !ok {
+					if _, ok := newPodsNameMap[pod.PodName]; !ok {
 						metric.DeletePartialMatch(prometheus.Labels{"pod": pod.PodName, "node": nodeName})
 						logger.Infof("Pod %v was deleted", pod.PodName)
 					}
 				}
-				pods = new_pods
+				pods = newPods
 			}
 			time.Sleep(time.Duration(runtimeConfig.RefreshInterval) * time.Second)
 		}
@@ -61,7 +60,6 @@ func createNodeInformer(ctx context.Context,
 	client *kubernetes.Clientset, metric *prometheus.GaugeVec,
 	logger *zap.SugaredLogger, runtimeConfig *RunConfiguration) {
 
-	// Creating Node informer
 	informerFactory := informers.NewSharedInformerFactoryWithOptions(client, time.Duration(time.Duration.Seconds(60)))
 	nodeinformer := informerFactory.Core().V1().Nodes().Informer()
 
@@ -71,29 +69,29 @@ func createNodeInformer(ctx context.Context,
 		logger.Fatalf("timed out waiting for caches to sync")
 	}
 
-	nodes := make(map[string]context.CancelFunc)
+	nodesContextMap := make(map[string]context.CancelFunc)
 	_, err := nodeinformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			node := obj.(*v1.Node)
 			logger.Infof("Node was added to the cluster : %v", node.Name)
 			metricsProcessingCtx, cancel := context.WithCancel(ctx)
-			nodes[node.Name] = cancel
-			// Starting goroutine for per node metrics refreshing
-			go metricsProcessing(metricsProcessingCtx, client, metric, node.Name, logger.Named(fmt.Sprintf("metricsProcessing: %v", node.Name)), runtimeConfig)
+			// Saving context to the map for node deleting event handling
+			nodesContextMap[node.Name] = cancel
+			// Starting goroutine for per node metrics monitoring
+			go metricsProcessing(metricsProcessingCtx, client, metric, node.Name, logger.Named("metricsProcessing").With("nodeName", node.Name), runtimeConfig)
 
 		},
 
 		DeleteFunc: func(obj interface{}) {
 			node := obj.(*v1.Node)
-			nodes[node.Name]()
-			delete(nodes, node.Name)
-			logger.Infof("Node was deleted : %v", node.Name)
+			nodesContextMap[node.Name]()
+			delete(nodesContextMap, node.Name)
+			logger.Infof("Node %v was deleted", node.Name)
 
 		},
 	})
 	if err != nil {
-		logger.Errorf("Node informer failed")
-		panic(err)
+		logger.Fatalf("Node informer failed")
 	}
 }
 
@@ -106,6 +104,7 @@ func registerPrometheusMetrics(ctx context.Context) *prometheus.GaugeVec {
 	return result
 }
 
+// Gets Node statitics from API, parsing it and register prometheus metric for each pod on the node
 func processSingleNodeMetrics(ctx context.Context, clientset *kubernetes.Clientset, logger *zap.SugaredLogger, metric *prometheus.GaugeVec, nodeName string) (*[]Pod, error) {
 	defer func() {
 		err := recover()
@@ -126,7 +125,7 @@ func processSingleNodeMetrics(ctx context.Context, clientset *kubernetes.Clients
 	json.Unmarshal(response, &node)
 
 	for _, pod := range node.Pods {
-		metric.With(prometheus.Labels{"pod": pod.PodRef.Name, "node": nodeName, "namespace": pod.PodRef.Namespace}).Set(pod.EphemeralStorage.Usedbytes)
+		metric.With(prometheus.Labels{"pod": pod.PodRef.Name, "node": nodeName, "namespace": pod.PodRef.Namespace}).Set(pod.EphemeralStorage.Usedbytes.(float64))
 		pods = append(pods, Pod{PodName: pod.PodRef.Name})
 	}
 	return &pods, nil
