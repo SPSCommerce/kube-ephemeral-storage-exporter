@@ -4,7 +4,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     {{- include "k8s-ephemeral-storage-exporter.labels" . | nindent 4 }}
-    {{- with .Values.monitoring.selector }}
+    {{- with .Values.serviceMonitor.selector }}
     {{ toYaml . }}
     {{- end }}
   name: {{ include "k8s-ephemeral-storage-exporter.fullname" . }}

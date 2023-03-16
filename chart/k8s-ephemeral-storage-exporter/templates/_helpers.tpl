@@ -54,5 +54,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "k8s-ephemeral-storage-exporter.serviceAccountName" -}}
-{{- default (include "k8s-ephemeral-storage-exporter.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "k8s-ephemeral-storage-exporter.fullname" .) }}
 {{- end }}
