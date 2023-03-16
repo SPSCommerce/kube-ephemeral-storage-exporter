@@ -10,12 +10,12 @@ pr:
       - .gitignore
 
 trigger:
-#  tags:
-#    include:
-#    - '*'
-  branches:
+  tags:
     include:
-      - main
+    - '*'
+#  branches:
+#    include:
+#      - main
   paths:
     exclude:
       - README.md
@@ -42,10 +42,6 @@ extends:
             steps:
               - checkout: self
                 clean: true
-
-              - task: GitTag@1
-                condition: and(succeeded(), eq(variables.isDefault, true))
-                continueOnError: true
 
               - task: BdpEcrPush@2
                 displayName: 'Publish image to test'
