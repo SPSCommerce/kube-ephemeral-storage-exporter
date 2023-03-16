@@ -1,0 +1,19 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "ephemeral-storage-exporter.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.selector }}
+    {{ toYaml . }}
+    {{- end }}
+  name: {{ include "ephemeral-storage-exporter.fullname" . }}
+spec:
+  endpoints:
+  - interval: {{ .Values.monitoring.interval }}s
+    path: /metrics
+    targetPort: {{ .Values.port }}
+    port: http
+  selector:
+    matchLabels:
+    {{- include "ephemeral-storage-exporter.selectorLabels" . | nindent 6 }}
