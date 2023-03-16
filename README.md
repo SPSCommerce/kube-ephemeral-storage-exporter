@@ -3,7 +3,7 @@
 
 Simple prometheus exporter that exports ephemeral storage metrics usage per pod. Such information is not available in kubelet metrics, so this project was created. 
 Metrics example: 
-```json
+```
 pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="aws-node-bhshq"} 24576
 pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="ebs-csi-node-thllk"} 61440
 pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="efs-csi-node-48w6n"} 1.009664e+07

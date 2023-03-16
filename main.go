@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -15,7 +14,6 @@ import (
 	"go.uber.org/zap/zapcore"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -60,11 +58,7 @@ func parseInputArguments() (*RunConfiguration, error) {
 		PlainLogs:       false,
 		RefreshInterval: 60,
 	}
-	if home := homedir.HomeDir(); home != "" {
-		flag.StringVar(&result.KubeConfig, "kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		flag.StringVar(&result.KubeConfig, "kubeconfig", "", "absolute path to the kubeconfig file")
-	}
+	flag.StringVar(&result.KubeConfig, "kubeconfig", "", "absolute path to the kubeconfig file")
 	flag.IntVar(&result.Port, "port", result.Port, fmt.Sprintf("(optional) port on which app would expose metrics, Defaults to %v", result.Port))
 	flag.IntVar(&result.RefreshInterval, "refresh-interval", result.RefreshInterval, fmt.Sprintf("(optional) refresh interval (in seconds) to re-read the metrics values, Defaults to %v", result.RefreshInterval))
 	flag.BoolVar(&result.PlainLogs, "plain-logs", result.PlainLogs, fmt.Sprintf("(optional) port on which app would expose metrics, Defaults to %v", result.Port))

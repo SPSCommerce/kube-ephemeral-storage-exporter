@@ -6,10 +6,10 @@ VERSION ?= $(shell git rev-parse --short HEAD)
 
 
 image: build_ci # Build executable and docker image
-	docker build -t kube-hpa-scale-to-zero:$(VERSION) .
+	docker build -t k8s-ephemeral-storage-exporter:$(VERSION) .
 
 local: # Run go application locally
 	go run main.go
 
 run: image # Run docker container in foreground
-	docker run -p 8080:8080 kube-hpa-scale-to-zero:$(VERSION)
+	docker run -p 9000:9000 k8s-ephemeral-storage-exporter:$(VERSION)
