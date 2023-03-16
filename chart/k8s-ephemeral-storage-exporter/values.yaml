@@ -1,11 +1,11 @@
-# Default values for k8s-ephemeral-storage-exporter.
+# Default values for kube-ephemeral-storage-exporter.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: k8s-ephemeral-storage-exporter
+  repository: kube-ephemeral-storage-exporter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.1"
@@ -53,6 +53,7 @@ resources: {}
   #   memory: 128Mi
 
 serviceMonitor:
+  enabled: true
   selector: []
 
 
