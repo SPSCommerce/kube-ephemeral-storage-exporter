@@ -8,7 +8,7 @@ image:
   repository: k8s-ephemeral-storage-exporter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.1"
+  tag: ""
 
 refreshInterval: 60
 plainLogs: false
@@ -71,7 +71,6 @@ resources: {}
   #   memory: 128Mi
 
 monitoring:
-  interval: 60
   selector:
     release: prom
 

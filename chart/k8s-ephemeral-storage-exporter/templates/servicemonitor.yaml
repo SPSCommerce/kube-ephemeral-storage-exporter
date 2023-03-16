@@ -10,7 +10,7 @@ metadata:
   name: {{ include "k8s-ephemeral-storage-exporter.fullname" . }}
 spec:
   endpoints:
-  - interval: {{ .Values.monitoring.interval }}s
+  - interval: {{ .Values.refreshInterval }}s
     path: /metrics
     targetPort: {{ .Values.port }}
     port: http
