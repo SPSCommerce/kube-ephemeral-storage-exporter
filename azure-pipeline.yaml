@@ -1,3 +1,5 @@
+name: $(version).$(buildCounter)
+
 pr:
   branches:
     include:
@@ -8,6 +10,9 @@ pr:
       - .gitignore
 
 trigger:
+#  tags:
+#    include:
+#    - '*'
   branches:
     include:
       - main
@@ -38,11 +43,15 @@ extends:
               - checkout: self
                 clean: true
 
+              - task: GitTag@1
+                condition: and(succeeded(), eq(variables.isDefault, true))
+                continueOnError: true
+
               - task: BdpEcrPush@2
                 displayName: 'Publish image to test'
                 condition: eq(variables.isDefault, true)
                 inputs:
-                  #dockerfile: Dockerfile
+                  dockerfile: Dockerfile
                   component: kube-ephemeral-storage-exporter
 
               - task: BdpEcrPromote@1
