@@ -10,9 +10,9 @@ pr:
       - .gitignore
 
 trigger:
- branches:
-   include:
-     - main
+  branches:
+    include:
+      - main
   paths:
     exclude:
       - README.md
