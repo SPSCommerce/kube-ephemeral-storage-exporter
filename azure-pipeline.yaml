@@ -1,0 +1,55 @@
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+      - .gitignore
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    exclude:
+      - README.md
+      - .gitignore
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      ref: refs/heads/main
+      name: SPSCommerce/azure-pipelines-templates
+      endpoint: vsts-infrastructure-sre
+
+extends:
+  # https://github.com/SPSCommerce/azure-pipelines-templates/tree/main/core
+  template: core/bdp.base.v1.yml@templates
+  parameters:
+    bdpFile: .bdp
+    stages:
+      - stage: BUILD
+        jobs:
+          - job: "BUILD"
+            pool: SRE
+            steps:
+              - checkout: self
+                clean: true
+
+              - task: BdpEcrPush@2
+                displayName: 'Publish image to test'
+                condition: eq(variables.isDefault, true)
+                inputs:
+                  dockerfile: Dockerfile
+                  component: k8s-ephemeral-storage-exporter
+
+              - task: BdpEcrPromote@1
+                displayName: 'Promote image to prod'
+                condition: eq(variables.isDefault, true)
+                inputs:
+                  serviceId: 1b7b8d98-c53a-4773-8648-1b6eed2f5083
+                  components: |
+                    k8s-ephemeral-storage-exporter
+                  

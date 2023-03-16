@@ -1,0 +1,11 @@
+schema_version: v3.0
+service:
+  id: 1b7b8d98-c53a-4773-8648-1b6eed2f5083
+
+environments:
+  - name: integration
+    region: us-east-1
+    account: "056684691971"
+  - name: prod
+    region: us-east-1
+    account: "104966627370"
