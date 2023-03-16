@@ -12,4 +12,4 @@ local: # Run go application locally
 	go run main.go
 
 run: image # Run docker container in foreground
-	docker run -p 8080:8080 k8s-ephemeral-storage-exporter:$(VERSION)
+	docker run -p 9000:9000 k8s-ephemeral-storage-exporter:$(VERSION)
