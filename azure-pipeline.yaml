@@ -43,7 +43,7 @@ extends:
                 condition: eq(variables.isDefault, true)
                 inputs:
                   dockerfile: Dockerfile
-                  component: k8s-ephemeral-storage-exporter
+                  component: kube-ephemeral-storage-exporter
 
               - task: BdpEcrPromote@1
                 displayName: 'Promote image to prod'
@@ -51,5 +51,5 @@ extends:
                 inputs:
                   serviceId: 1b7b8d98-c53a-4773-8648-1b6eed2f5083
                   components: |
-                    k8s-ephemeral-storage-exporter
+                    kube-ephemeral-storage-exporter
                   

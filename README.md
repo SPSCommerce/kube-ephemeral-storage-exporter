@@ -1,7 +1,7 @@
-# k8s-ephemeral-storage-exporter
+# kube-ephemeral-storage-exporter
 
 
-Simple prometheus exporter that exports ephemeral storage metrics usage per pod. Such information is not available in kubelet metrics, so this project was created. 
+Simple prometheus exporter that exports ephemeral storage metrics usage per pod. Such information is not available in kubelet metrics so far, so this project was created. 
 Metrics example: 
 ```
 pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="aws-node-bhshq"} 24576
