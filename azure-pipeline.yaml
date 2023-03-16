@@ -42,7 +42,7 @@ extends:
                 displayName: 'Publish image to test'
                 condition: eq(variables.isDefault, true)
                 inputs:
-                  dockerfile: Dockerfile
+                  #dockerfile: Dockerfile
                   component: kube-ephemeral-storage-exporter
 
               - task: BdpEcrPromote@1
