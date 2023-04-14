@@ -1,0 +1,21 @@
+{{- if eq .Values.serviceMonitor.enabled "true" }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "kube-ephemeral-storage-exporter.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.selector }}
+    {{ toYaml . }}
+    {{- end }}
+  name: {{ include "kube-ephemeral-storage-exporter.fullname" . }}
+spec:
+  endpoints:
+  - interval: {{ .Values.refreshInterval }}s
+    path: /metrics
+    targetPort: {{ .Values.port }}
+    port: http
+  selector:
+    matchLabels:
+    {{- include "kube-ephemeral-storage-exporter.selectorLabels" . | nindent 6 }}
+{{- end }}
