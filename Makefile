@@ -5,7 +5,7 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
 
 
-image: build_ci # Build executable and docker image
+image: # Build docker image
 	docker build -t kube-ephemeral-storage-exporter:$(VERSION) .
 
 local: # Run go application locally

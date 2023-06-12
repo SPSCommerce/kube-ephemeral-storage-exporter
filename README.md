@@ -9,14 +9,45 @@ pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.
 pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="efs-csi-node-48w6n"} 1.009664e+07
 ```
 
+## Building
+Run go application locally
+```
+make local
+```
+Build docker image named `kube-ephemeral-storage-exporter`
+```
+make image
+```
+Build and run docker image in foreground
+```
+make run
+```
+## Configuration
+Accepts several configuration parameter so far
 
-## Architecture overview
+| Parameter        | Description                                                             | Default value |
+|------------------|-------------------------------------------------------------------------|---------------|
+| kubeconfig       | absolute path to the kubeconfig file                                    | ""            |
+| port             | (optional) port on which app would expose metrics.                      | 9000          |
+| refresh-interval | (optional) refresh interval (in seconds) to re-read the metrics values. | 60            |
+| plain-logs       | (optional) turn on plain logs. By defult logs are in JSON format        | false         |
 
+## Deploy
 
+Can be deployed via helm chart
 
-## TO DO
-- tests
-- make configurable via environment variables (flags should have higher priority than environment variables)
-- add debug logging level
-- handle update event in informer
-- rewrite error handling, fail per node goroutine when error received and recreate it with update event in informer
+```
+helm install ephemeral-storage-exporter ./kube-ephemeral-storage-exporter
+```
+
+## Permissions
+
+Require cluster wide permissions:
+```
+  - apiGroups: [ "" ]
+    resources: [ "nodes/proxy" ]
+    verbs: [ "get" ]
+  - apiGroups: [ "" ]
+    resources: [ "nodes" ]
+    verbs: [ "list","watch" ]
+```

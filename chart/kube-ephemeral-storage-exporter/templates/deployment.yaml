@@ -31,9 +31,6 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag  }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-{{/*          command:*/}}
-{{/*            - sleep*/}}
-{{/*            - infinity*/}}
           args:
             - --port={{ .Values.service.port }}
             - --refresh-interval={{ .Values.refreshInterval }}
