@@ -1,12 +1,19 @@
 # kube-ephemeral-storage-exporter
 
 
+We started this project as the result of https://github.com/kubernetes/kubernetes/issues/69507 <- thread
+
+
+## Limitation
+
+Kube-api-server does not return per container value, so we сan have only per-pod overall usage value.
+
 Simple prometheus exporter that exports ephemeral storage metrics usage per pod. Such information is not available in kubelet metrics so far, so this project was created. 
 Metrics example: 
 ```
-pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="aws-node-bhshq"} 24576
-pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="ebs-csi-node-thllk"} 61440
-pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="efs-csi-node-48w6n"} 1.009664e+07
+kube_pod_ephemeral_storage_usage_bytes{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="aws-node-bhshq"} 24576
+kube_pod_ephemeral_storage_usage_bytes{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="ebs-csi-node-thllk"} 61440
+kube_pod_ephemeral_storage_usage_bytes{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="efs-csi-node-48w6n"} 1.009664e+07
 ```
 
 ## Building
