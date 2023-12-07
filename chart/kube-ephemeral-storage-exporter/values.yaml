@@ -1,11 +1,16 @@
+# -- Number of replicas to run. There n oreason to run more than one replica as this pod requests kube-api-server to grab data;
 replicaCount: 1
 
+# -- Docker image to use
 image:
   repository: kube-ephemeral-storage-exporter
   pullPolicy: IfNotPresent
   tag: ""
 
+# -- Refresh interval (in seconds) to re-read the metrics values.
 refreshInterval: 60
+
+# -- Turn on plain logs. By defult logs are in JSON format
 plainLogs: false
 
 
@@ -28,7 +33,9 @@ service:
 
 resources: {}
 
+
 serviceMonitor:
+  # -- Enable serviceMonitor CRD creation
   enabled: true
   selector: []
 
