@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
     "github.com/spscommerce/kube-ephemeral-storage-exporter/internal"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -18,7 +17,7 @@ import (
 
 func main() {
 	// Parsing input arguments
-	runtimeConfig, err := parseInputArguments()
+	runtimeConfig, err := internal.ParseInputArguments()
 	if err != nil {
 		panic(err)
 	}
@@ -41,12 +40,12 @@ func main() {
 
 	core := zapcore.NewTee(
 		zapcore.NewCore(
-			getLogEncoder(runtimeConfig.PlainLogs, encoderCfg),
+			internal.GetLogEncoder(runtimeConfig.PlainLogs, encoderCfg),
 			stdoutSyncer,
 			infoLevel,
 		),
 		zapcore.NewCore(
-			getLogEncoder(runtimeConfig.PlainLogs, encoderCfg),
+			internal.GetLogEncoder(runtimeConfig.PlainLogs, encoderCfg),
 			stderrSyncer,
 			errorLevel,
 		),
@@ -71,13 +70,13 @@ func main() {
 	rootCtx := context.Background()
 
 	// Setting prometheus metric
-	metrics := registerPrometheusMetrics(rootCtx)
+	metrics := internal.RegisterPrometheusMetrics(rootCtx)
 
 	// Starting goroutine with main logic
-	go createNodeInformer(rootCtx, clientset, metrics, logger.Named("nodeInformer"), runtimeConfig)
+	go internal.CreateNodeInformer(rootCtx, clientset, metrics, logger.Named("nodeInformer"), runtimeConfig)
 	// Set up http endpoints
 	http.Handle("/metrics", promhttp.Handler())
-	http.Handle("/up", http.HandlerFunc(upEndpointHandler))
+	http.Handle("/up", http.HandlerFunc(internal.UpEndpointHandler))
 	if http.ListenAndServe(fmt.Sprintf(":%d", runtimeConfig.Port), nil) != nil {
 		logger.Fatalf("unable to listen port %d: %s", runtimeConfig.Port, err)
 	}
