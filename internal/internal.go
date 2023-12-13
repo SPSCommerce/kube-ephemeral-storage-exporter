@@ -3,17 +3,14 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
+	"flag"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -43,7 +40,15 @@ type PodRef struct {
 	} `json:"ephemeral-storage"`
 }
 
-func parseInputArguments() (*RunConfiguration, error) {
+type Node struct {
+	Node struct {
+		NodeName string `json:"nodeName"`
+	} `json:"node"`
+	Pods []PodRef `json:"pods"`
+}
+
+
+func ParseInputArguments() (*RunConfiguration, error) {
 
 	result := RunConfiguration{
 		KubeConfig:      "",
@@ -60,21 +65,21 @@ func parseInputArguments() (*RunConfiguration, error) {
 
 }
 
-func getLogEncoder(usePlain bool, config zapcore.EncoderConfig) zapcore.Encoder {
+func GetLogEncoder(usePlain bool, config zapcore.EncoderConfig) zapcore.Encoder {
 	if usePlain {
 		return zapcore.NewConsoleEncoder(config)
 	}
 	return zapcore.NewJSONEncoder(config)
 }
 
-func upEndpointHandler(w http.ResponseWriter, r *http.Request) {
+func UpEndpointHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("up"))
 	if err != nil {
 		zap.Error(fmt.Errorf("unable to handle request to up endpoint: %s", err))
 	}
 }
 
-func metricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, metric *prometheus.GaugeVec, nodeName string, logger *zap.SugaredLogger, runtimeConfig *RunConfiguration) {
+func MetricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, metric *prometheus.GaugeVec, nodeName string, logger *zap.SugaredLogger, runtimeConfig *RunConfiguration) {
 	pods := &[]Pod{}
 	for {
 		select {
@@ -85,7 +90,7 @@ func metricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, met
 		default:
 			logger.Infof("Gathering metrics for pods on node: %v", nodeName)
 
-			newPods, err := processSingleNodeMetrics(ctx, clientset, logger, metric, nodeName)
+			newPods, err := ProcessSingleNodeMetrics(ctx, clientset, logger, metric, nodeName)
 			if err != nil {
 				logger.Errorf("unable to process node metrics: %s", err)
 				newPods = &[]Pod{}
@@ -110,7 +115,7 @@ func metricsProcessing(ctx context.Context, clientset *kubernetes.Clientset, met
 	}
 }
 
-func createNodeInformer(ctx context.Context,
+func CreateNodeInformer(ctx context.Context,
 	client *kubernetes.Clientset, metric *prometheus.GaugeVec,
 	logger *zap.SugaredLogger, runtimeConfig *RunConfiguration) {
 
@@ -132,7 +137,7 @@ func createNodeInformer(ctx context.Context,
 			// Saving context to the map for node deleting event handling
 			nodeContextCancellationFuncs[node.Name] = cancel
 			// Starting goroutine for per node metrics monitoring
-			go metricsProcessing(metricsProcessingCtx, client, metric, node.Name,
+			go MetricsProcessing(metricsProcessingCtx, client, metric, node.Name,
 				logger.Named("metricsProcessing").With("nodeName", node.Name),
 				runtimeConfig)
 
@@ -151,7 +156,7 @@ func createNodeInformer(ctx context.Context,
 	}
 }
 
-func registerPrometheusMetrics(ctx context.Context) *prometheus.GaugeVec {
+func RegisterPrometheusMetrics(ctx context.Context) *prometheus.GaugeVec {
 	result := promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "kube_pod_ephemeral_storage_usage_bytes",
 		Help: "Used to expose Ephemeral Storage metrics for pod",
@@ -161,7 +166,7 @@ func registerPrometheusMetrics(ctx context.Context) *prometheus.GaugeVec {
 }
 
 // Gets Node statistics from API, parsing it and register prometheus metric for each pod on the node
-func processSingleNodeMetrics(ctx context.Context, clientset *kubernetes.Clientset, logger *zap.SugaredLogger, metric *prometheus.GaugeVec, nodeName string) (*[]Pod, error) {
+func ProcessSingleNodeMetrics(ctx context.Context, clientset *kubernetes.Clientset, logger *zap.SugaredLogger, metric *prometheus.GaugeVec, nodeName string) (*[]Pod, error) {
 	response, err := clientset.CoreV1().RESTClient().Get().Resource("nodes").Name(nodeName).SubResource("proxy").Suffix("stats/summary").DoRaw(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error occured when reaching kubelet api for getting node metrics: %s", err)
