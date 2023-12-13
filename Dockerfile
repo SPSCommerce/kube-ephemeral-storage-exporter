@@ -1,6 +1,6 @@
 FROM golang:1.19.5-alpine3.17
 COPY . /sources
-WORKDIR /sources
+WORKDIR /sources/cmd
 RUN go build -ldflags "-s" -o run
 
 
