@@ -158,8 +158,8 @@ func CreateNodeInformer(ctx context.Context,
 
 func RegisterPrometheusMetrics(ctx context.Context) *prometheus.GaugeVec {
 	result := promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "kube_pod_ephemeral_storage_usage_bytes",
-		Help: "Used to expose Ephemeral Storage metrics for pod",
+		Name: "pod_ephemeral_storage_utilization",
+		Help: "The total number of bytes of ephemeral storage used by a pod",
 	}, []string{"pod", "node", "namespace"},
 	)
 	return result
