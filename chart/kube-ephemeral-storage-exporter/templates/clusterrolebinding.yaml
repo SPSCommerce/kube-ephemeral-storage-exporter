@@ -1,0 +1,15 @@
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "kube-ephemeral-storage-exporter.fullname" . }}
+  labels:
+    {{- include "kube-ephemeral-storage-exporter.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kube-ephemeral-storage-exporter.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "kube-ephemeral-storage-exporter.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
