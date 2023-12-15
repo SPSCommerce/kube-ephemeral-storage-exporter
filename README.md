@@ -5,6 +5,7 @@ Such metric was not present in kubelet metrics at the moment of writing this.
 Discussion for adding it is
 in [Exposing ephemeral storage metrics to prometheus](https://github.com/kubernetes/kubernetes/issues/69507) issue.
 
+
 Example of metric:
 
 ```
