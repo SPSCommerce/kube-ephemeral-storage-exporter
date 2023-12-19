@@ -40,6 +40,9 @@ helm.sh/chart: {{ include "kube-ephemeral-storage-exporter.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ with .Values.labels }}
+{{- toYaml . }}
+{{- end }}
 {{- end }}
 
 {{/*
