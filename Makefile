@@ -9,7 +9,8 @@ image: # Build docker image
 	docker build -t kube-ephemeral-storage-exporter:$(VERSION) .
 
 local: # Run go application locally
-	go run ${ENTRY_POINT}
+	go run ${ENTRY_POINT} \
+	--kubeconfig=${HOME}/.kube/config 
 
 run: image # Run docker container in foreground
 	docker run -p 9000:9000 kube-ephemeral-storage-exporter:$(VERSION)
