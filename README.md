@@ -1,24 +1,19 @@
 # kube-ephemeral-storage-exporter
 
-Simple prometheus exporter that exports ephemeral storage metrics usage per pod.
-Such metric was not present in kubelet metrics at the moment of writing this.
-Discussion for adding it is
-in [Exposing ephemeral storage metrics to prometheus](https://github.com/kubernetes/kubernetes/issues/69507) issue.
+Simple Prometheus exporter that exports ephemeral storage metrics usage per pod. Such metrics were not present in kubelet metrics at the moment of writing this. Discussion for adding it is in the Exposing Ephemeral Storage Metrics to Prometheus issue.
 
-Example of metric:
+Example of the metric:
 
 ```
-pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="aws-node-bhshq"} 24576
-pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="ebs-csi-node-thllk"} 61440
-pod_ephemeral_storage_utilization{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="efs-csi-node-48w6n"} 1.009664e+07
+pod_ephemeral_storage_utilization_bytes{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="aws-node-bhshq"} 24576
+pod_ephemeral_storage_utilization_bytes{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="ebs-csi-node-thllk"} 61440
+pod_ephemeral_storage_utilization_bytes{namespace="kube-system",node="ip-10-140-26-17.ec2.internal",pod="efs-csi-node-48w6n"} 1.009664e+07
 ```
 
-The data is collected from kube-api-server nodes API. Metrics value is in bytes.
 
 ## Limitation
 
-Kube-api-server does not return per container value for storage usage, so we сan have metric only per pod and not per
-container.
+Kube-api-server does not return per container value for storage usage, so we can have metrics only per pod and not per container
 Keep in mind that [kubelet](https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/stats/helper.go#L399)
 counts pod's logs as ephemeral storage.
 

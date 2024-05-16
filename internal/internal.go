@@ -3,10 +3,10 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"time"
-	"flag"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -46,7 +46,6 @@ type Node struct {
 	} `json:"node"`
 	Pods []PodRef `json:"pods"`
 }
-
 
 func ParseInputArguments() (*RunConfiguration, error) {
 
@@ -158,7 +157,7 @@ func CreateNodeInformer(ctx context.Context,
 
 func RegisterPrometheusMetrics(ctx context.Context) *prometheus.GaugeVec {
 	result := promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "pod_ephemeral_storage_utilization",
+		Name: "pod_ephemeral_storage_utilization_bytes",
 		Help: "The total number of bytes of ephemeral storage used by a pod",
 	}, []string{"pod", "node", "namespace"},
 	)
