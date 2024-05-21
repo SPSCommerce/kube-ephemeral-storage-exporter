@@ -8,7 +8,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	go.uber.org/zap v1.27.0
 	k8s.io/api v0.30.1
-	k8s.io/client-go v0.30.0
+	k8s.io/client-go v0.30.1
 )
 
 require (
