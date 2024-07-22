@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	github.com/prometheus/client_golang v1.19.1
 	go.uber.org/zap v1.27.0
-	k8s.io/api v0.30.2
+	k8s.io/api v0.30.3
 	k8s.io/client-go v0.30.2
 )
 
@@ -46,7 +46,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apimachinery v0.30.2 // indirect
+	k8s.io/apimachinery v0.30.3 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240521193020-835d969ad83a // indirect
 	k8s.io/utils v0.0.0-20240502163921-fe8a2dddb1d0 // indirect
