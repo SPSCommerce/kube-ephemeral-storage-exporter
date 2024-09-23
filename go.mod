@@ -3,7 +3,7 @@ module github.com/spscommerce/kube-ephemeral-storage-exporter
 go 1.22.3
 
 require (
-	github.com/prometheus/client_golang v1.20.3
+	github.com/prometheus/client_golang v1.20.4
 	go.uber.org/zap v1.27.0
 	k8s.io/api v0.31.1
 	k8s.io/client-go v0.31.1
