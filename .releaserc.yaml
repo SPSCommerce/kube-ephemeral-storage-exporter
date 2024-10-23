@@ -10,6 +10,25 @@ fail: false
 branches:
 - main
 plugins:
-- "@semantic-release/commit-analyzer"
+- - "@semantic-release/commit-analyzer"
+  - releaseRules:
+      - type: chore
+        release: patch
 - "@semantic-release/release-notes-generator"
 - "@semantic-release/github"
+- - "@google/semantic-release-replace-plugin"
+  - replacements:
+      - files: "chart/kube-ephemeral-storage-exporter/Chart.yaml"
+        allowEmptyPaths: false
+        disableGlobs: false
+        from: "^appVersion: .*"
+        to: "appVersion: ${nextRelease.version}"
+      - files: "chart/kube-ephemeral-storage-exporter/Chart.yaml"
+        allowEmptyPaths: false
+        disableGlobs: false
+        from: "^version: .*"
+        to: "version: ${nextRelease.version}"
+- - "@semantic-release/git"
+  - message: "Release new version: ${nextRelease.version} [skip ci]"
+    assets:
+      - "chart/kube-ephemeral-storage-exporter/Chart.yaml"
